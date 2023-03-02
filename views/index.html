@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <form action="" id="my-form">
+    Name<input type="text" id="name"><br>
+    Name<input type="number" id="phone"><br>
+    Name<input type="email" id="email"><br>
+    <input type="submit" value="submit"></button>
+    </button>
+  </form>
+  <ul id="users">
+
+  </ul>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
+  <script defer src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    const myform = document.getElementById('my-form')
+    myform.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+      const email = document.getElementById("email").value;
+
+      axios.post('http://localhost:3000/user/createUser', {
+        name: name,
+        phone: phone,
+        email: email
+      })
+        .then(result => { console.log(result); })
+    })
+    function display() {
+      axios.get('http://localhost:3000/user/display')
+        .then(res => console.log(res))
+    }
+    window.addEventListener('DOMContentLoaded', (event) => {
+      axios.get('http://localhost:3000/user/display')
+        .then((res)=>{
+          // console.log(res);
+          res.data.forEach((element)=>
+          showAll(element)
+          )
+          
+        })
+    });
+    function showAll(res) {
+    try {
+        const ul = document.getElementById('users')
+        let li = document.createElement('li')
+        let btn = document.createElement('button')
+        li.className = 'card mt-3'
+        btn.className = 'form-control bg-info'
+        btn.value = 'delete'
+        li.id = res.id
+        btn.onclick = async () => {
+            try {
+                if (confirm('Are you sure?')) {
+                    var e = document.getElementById(li.id)
+                    var ul = e.parentElement
+                    const delete1 = await axios.delete('http://localhost:3000/user/delete/',{
+                      params:{
+                        id:res.id
+                      }
+                    })
+                    ul.removeChild(e)
+                };
+            }
+            catch (err) {
+                alert('Error: User Doesnt exists')
+                console.log(err)
+                throw new Error()
+            }
+        };
+        btn.appendChild(document.createTextNode(`Delete`))
+        li.innerHTML = `<table class="table">
+                        <tbody>
+                        <tr>
+                            <th scope="row">Price</th>
+                            <td>${res.name}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Product Name</th>
+                            <td>${res.email}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Category</th>
+                            <td>${res.phone}</td>
+                        </tr>
+                        </tbody>
+                    </table>`
+        li.appendChild(btn)
+        ul.appendChild(li)
+        
+    }
+    catch (err) {
+        alert('Error occured')
+        console.log(err)
+        throw new Error()
+    }
+}
+
+  </script>
+</body>
+
+</html>
